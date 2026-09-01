@@ -1,1 +1,31 @@
 @import "tailwindcss";
+
+@theme {
+  --color-pitch: #0f3d2e;
+  --color-turf: #2f6b4f;
+  --color-lime: #c6f26e;
+  --color-sand: #f4f1ea;
+  --color-ink: #14221c;
+  --color-muted: #5c6b63;
+  --color-line: #d9d3c7;
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+@keyframes pay-ring {
+  0% {
+    transform: scale(0.85);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1.45);
+    opacity: 0;
+  }
+}
+
+.pay-ring {
+  animation: pay-ring 1.4s ease-out infinite;
+}
+
+.pay-ring-delay {
+  animation-delay: 0.7s;
+}

@@ -1,0 +1,49 @@
+@if (store.slotsState() === 'loading') {
+  <p class="text-sm text-muted">Cargando horarios…</p>
+} @else if (store.slotsState() === 'down') {
+  <p class="text-sm text-red-700">No se pudo cargar la disponibilidad.</p>
+} @else if (store.slotsState() === 'empty') {
+  <p class="text-sm text-muted">Esta cancha no tiene horarios ese día.</p>
+} @else {
+  <div class="mb-3 flex flex-wrap gap-3 text-xs text-muted">
+    <span class="inline-flex items-center gap-1.5"><span class="size-2.5 rounded-full bg-turf"></span> Libre</span>
+    <span class="inline-flex items-center gap-1.5"><span class="size-2.5 rounded-full bg-amber-300"></span> En hold</span>
+    <span class="inline-flex items-center gap-1.5"><span class="size-2.5 rounded-full bg-neutral-300"></span> Reservado</span>
+    <span class="inline-flex items-center gap-1.5"><span class="size-2.5 rounded-full bg-lime"></span> Elegido</span>
+  </div>
+
+  <div class="grid grid-cols-2 gap-2 sm:grid-cols-3">
+    @for (slot of store.slots(); track slot.start; let i = $index) {
+      @let tz = store.court()?.timezone ?? 'America/Bogota';
+      <button
+        type="button"
+        class="rounded-xl border px-3 py-2.5 text-sm"
+        [disabled]="slot.status !== 'free'"
+        [class.border-lime]="isInRange(i)"
+        [class.bg-lime]="isInRange(i)"
+        [class.text-ink]="isInRange(i)"
+        [class.border-turf]="slot.status === 'free' && !isInRange(i)"
+        [class.text-pitch]="slot.status === 'free' && !isInRange(i)"
+        [class.bg-white]="slot.status === 'free' && !isInRange(i)"
+        [class.border-amber-200]="slot.status === 'held'"
+        [class.bg-amber-50]="slot.status === 'held'"
+        [class.text-amber-800]="slot.status === 'held'"
+        [class.border-line]="slot.status === 'booked'"
+        [class.bg-neutral-200]="slot.status === 'booked'"
+        [class.text-muted]="slot.status === 'booked'"
+        [class.cursor-not-allowed]="slot.status !== 'free'"
+        (click)="store.pickSlot(i)"
+      >
+        {{ clock(slot.start, tz) }} – {{ clock(slot.end, tz) }}
+      </button>
+    }
+  </div>
+
+  @if (store.selectedRange(); as range) {
+    <p class="mt-4 text-sm font-medium text-pitch">
+      {{ hours(store.selectedMinutes()) }} h · {{ money(store.estimatedTotal()) }}
+    </p>
+  } @else if (store.rangeStart() !== null) {
+    <p class="mt-4 text-sm text-muted">Elige la hora de fin. Mínimo 1 hora, en bloques libres seguidos.</p>
+  }
+}
