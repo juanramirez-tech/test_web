@@ -1,0 +1,21 @@
+{
+  "version": "1.0.0",
+  "paths": [
+    "/health",
+    "/login",
+    "/api/v1/courts",
+    "/api/v1/courts/availability",
+    "/api/v1/courts/{id}",
+    "/api/v1/courts/{id}/availability",
+    "/api/v1/bookings",
+    "/api/v1/bookings/mine",
+    "/api/v1/bookings/pay",
+    "/api/v1/bookings/cancel",
+    "/api/v1/admin/courts",
+    "/api/v1/admin/courts/{id}",
+    "/api/v1/admin/bookings",
+    "/api/v1/admin/bookings/{id}",
+    "/api/v1/admin/bookings/{id}/confirm",
+    "/api/v1/admin/bookings/{id}/cancel"
+  ]
+}

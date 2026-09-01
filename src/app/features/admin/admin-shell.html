@@ -1,0 +1,11 @@
+<header>
+  <p>{{ email() }}</p>
+  <nav>
+    <a routerLink="/">Sitio público</a>
+    <a routerLink="/admin/dashboard" routerLinkActive="active">Dashboard</a>
+    <button type="button" (click)="logout()">Salir</button>
+  </nav>
+</header>
+<main>
+  <router-outlet />
+</main>
