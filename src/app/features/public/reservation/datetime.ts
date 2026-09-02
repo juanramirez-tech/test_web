@@ -124,3 +124,85 @@ export function toBookingItem(courtId: number, range: readonly AvailabilitySlot[
 export function isColombianPhone(value: string): boolean {
   return /^3\d{9}$/.test(value.trim());
 }
+
+export const WEEKDAY_LABELS = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'] as const;
+
+export function parseYmd(ymd: string): { year: number; month: number; day: number } {
+  if (!isDateYmd(ymd)) {
+    throw new Error('Fecha inválida');
+  }
+  const [year, month, day] = ymd.split('-').map(Number);
+  return { year, month, day };
+}
+
+export function formatYmd(year: number, month: number, day: number): string {
+  return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+}
+
+export function shiftMonth(year: number, month: number, delta: number): { year: number; month: number } {
+  const utc = new Date(Date.UTC(year, month - 1 + delta, 1));
+  return { year: utc.getUTCFullYear(), month: utc.getUTCMonth() + 1 };
+}
+
+export function monthOverlapsWindow(
+  year: number,
+  month: number,
+  minYmd: string,
+  maxYmd: string,
+): boolean {
+  const start = formatYmd(year, month, 1);
+  const end = formatYmd(year, month, new Date(Date.UTC(year, month, 0)).getUTCDate());
+  return start <= maxYmd && end >= minYmd;
+}
+
+export type CalendarCell = {
+  ymd: string;
+  day: number;
+  inMonth: boolean;
+  selectable: boolean;
+};
+
+export function monthCells(
+  year: number,
+  month: number,
+  minYmd: string,
+  maxYmd: string,
+): CalendarCell[] {
+  const first = formatYmd(year, month, 1);
+  const mondayOffset = (new Date(Date.UTC(year, month - 1, 1)).getUTCDay() + 6) % 7;
+  const start = addCalendarDays(first, -mondayOffset);
+  const cells: CalendarCell[] = [];
+
+  for (let i = 0; i < 42; i += 1) {
+    const ymd = addCalendarDays(start, i);
+    const parts = parseYmd(ymd);
+    cells.push({
+      ymd,
+      day: parts.day,
+      inMonth: parts.year === year && parts.month === month,
+      selectable: ymd >= minYmd && ymd <= maxYmd,
+    });
+  }
+
+  return cells;
+}
+
+export function formatMonthTitle(year: number, month: number): string {
+  const label = new Intl.DateTimeFormat('es-CO', {
+    month: 'long',
+    year: 'numeric',
+    timeZone: 'UTC',
+  }).format(new Date(Date.UTC(year, month - 1, 1)));
+  return label.charAt(0).toUpperCase() + label.slice(1);
+}
+
+export function formatFriendlyDate(ymd: string): string {
+  const { year, month, day } = parseYmd(ymd);
+  const label = new Intl.DateTimeFormat('es-CO', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    timeZone: 'UTC',
+  }).format(new Date(Date.UTC(year, month - 1, day)));
+  return label.charAt(0).toUpperCase() + label.slice(1);
+}

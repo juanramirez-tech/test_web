@@ -1,20 +1,48 @@
-<div class="mx-auto max-w-3xl px-5 py-10">
-  <section class="mb-10">
+<div class="mx-auto max-w-7xl px-5 py-10">
+  <section class="mb-10 max-w-2xl">
     <p class="text-sm font-medium text-turf">Reserva de canchas</p>
     <h1 class="mt-1 text-3xl font-semibold tracking-tight sm:text-4xl">Reserva sin registro, en minutos</h1>
-    <p class="mt-3 max-w-xl text-muted">Elige cancha, día y horario. Pagas (simulado) y queda confirmada.</p>
+    <p class="mt-3 text-muted">Elige cancha, día y horario. Pagas (simulado) y queda confirmada.</p>
   </section>
 
-  <ol class="mb-10 flex gap-2 text-xs sm:text-sm">
-    @for (item of steps; track item.n) {
-      <li
-        class="flex-1 rounded-full px-2 py-1.5 text-center"
-        [class.bg-pitch]="store.step() === item.n"
-        [class.text-sand]="store.step() === item.n"
-        [class.bg-white]="store.step() !== item.n"
-        [class.text-muted]="store.step() !== item.n"
-      >
-        {{ item.n }}. {{ item.label }}
+  <ol class="mb-12 flex items-start" aria-label="Pasos de la reserva">
+    @for (item of steps; track item.n; let last = $last) {
+      <li class="flex items-start" [class.flex-1]="!last">
+        <div class="flex w-12 shrink-0 flex-col items-center sm:w-16">
+          <span
+            class="flex size-8 items-center justify-center rounded-full text-xs font-semibold sm:size-9 sm:text-sm"
+            [class.bg-pitch]="store.step() > item.n"
+            [class.text-lime]="store.step() > item.n"
+            [class.bg-lime]="store.step() === item.n"
+            [class.text-pitch]="store.step() === item.n"
+            [class.border]="store.step() < item.n"
+            [class.border-line]="store.step() < item.n"
+            [class.bg-white]="store.step() < item.n"
+            [class.text-muted]="store.step() < item.n"
+          >
+            @if (store.step() > item.n) {
+              <span aria-hidden="true">✓</span>
+              <span class="sr-only">Completado</span>
+            } @else {
+              {{ item.n }}
+            }
+          </span>
+          <span
+            class="mt-2 text-center text-[10px] font-medium sm:text-xs"
+            [class.text-pitch]="store.step() >= item.n"
+            [class.text-muted]="store.step() < item.n"
+          >
+            {{ item.label }}
+          </span>
+        </div>
+        @if (!last) {
+          <div
+            class="mt-4 h-0.5 min-w-2 flex-1 rounded-full"
+            [class.bg-pitch]="store.step() > item.n"
+            [class.bg-line]="store.step() <= item.n"
+            aria-hidden="true"
+          ></div>
+        }
       </li>
     }
   </ol>
@@ -33,63 +61,64 @@
       <app-court-picker />
     </section>
 
-    <section id="paso-fecha" class="mt-10 scroll-mt-6" [class.opacity-40]="!store.court()">
-      <h2 class="mb-4 text-lg font-semibold">2. Día</h2>
-      <label class="mb-1 block text-sm text-muted" for="booking-date">Fecha</label>
-      <input
-        id="booking-date"
-        type="date"
-        class="rounded-xl border border-line bg-white px-3 py-2.5 outline-none focus:border-pitch"
-        [disabled]="!store.court()"
-        [min]="store.dateMin()"
-        [max]="store.dateMax()"
-        [value]="store.date()"
-        (change)="onDateChange($event)"
-      />
-    </section>
+    <div
+      id="paso-cuando"
+      class="mt-12 grid items-start gap-8 scroll-mt-6 lg:grid-cols-[minmax(18rem,24rem)_minmax(0,1fr)]"
+    >
+      <section id="paso-fecha" class="lg:sticky lg:top-6" [class.opacity-70]="!store.court()">
+        <h2 class="mb-1 text-lg font-semibold">2. Día</h2>
+        <p class="mb-4 text-sm text-muted">Disponible desde hoy hasta 30 días.</p>
+        <app-date-calendar />
+      </section>
 
-    <section id="paso-horario" class="mt-10 scroll-mt-6" [class.opacity-40]="!store.date()">
-      <h2 class="mb-4 text-lg font-semibold">3. Horario</h2>
-      @if (!store.date()) {
-        <p class="text-sm text-muted">Primero elige un día.</p>
-      } @else {
-        <app-slot-grid />
-      }
-    </section>
-
-    <section id="paso-datos" class="mt-10 scroll-mt-6" [class.opacity-40]="!store.selectedRange()">
-      <h2 class="mb-4 text-lg font-semibold">4. Datos y confirmación</h2>
-      @if (!store.selectedRange()) {
-        <p class="text-sm text-muted">Selecciona al menos 1 hora libre para continuar.</p>
-      } @else {
-        <app-guest-form />
-
-        @if (store.court(); as court) {
-          @if (store.selectedRange(); as range) {
-            <aside class="mt-6 rounded-2xl border border-line bg-white px-4 py-4 text-sm">
-              <p class="font-medium">{{ court.name }}</p>
-              <p class="mt-1 text-muted">
-                {{ store.date() }} · {{ clock(range[0].start, court.timezone) }} –
-                {{ clock(range[range.length - 1].end, court.timezone) }}
-              </p>
-              <p class="mt-2 font-medium text-pitch">{{ money(store.estimatedTotal()) }}</p>
-            </aside>
+      <div class="min-w-0 space-y-10">
+        <section id="paso-horario" [class.opacity-40]="!store.date()">
+          <h2 class="mb-1 text-lg font-semibold">3. Horario</h2>
+          <p class="mb-4 text-sm text-muted">Elige un bloque libre de al menos 1 hora.</p>
+          @if (!store.date()) {
+            <div class="rounded-2xl border border-dashed border-line bg-white/70 px-4 py-10 text-sm text-muted">
+              Primero elige un día en el calendario.
+            </div>
+          } @else {
+            <app-slot-grid />
           }
-        }
+        </section>
 
-        @if (store.error() && store.selectedRange()) {
-          <p class="mt-4 text-sm text-red-700" role="alert">{{ store.error() }}</p>
-        }
+        <section id="paso-datos" class="scroll-mt-6" [class.opacity-40]="!store.selectedRange()">
+          <h2 class="mb-4 text-lg font-semibold">4. Datos y confirmación</h2>
+          @if (!store.selectedRange()) {
+            <p class="text-sm text-muted">Selecciona al menos 1 hora libre para continuar.</p>
+          } @else {
+            <app-guest-form />
 
-        <button
-          type="button"
-          class="mt-6 w-full rounded-2xl bg-pitch px-4 py-3 font-semibold text-sand hover:bg-turf disabled:cursor-not-allowed disabled:opacity-50"
-          [disabled]="!store.canSubmit()"
-          (click)="store.submit()"
-        >
-          Pagar {{ money(store.estimatedTotal()) }}
-        </button>
-      }
-    </section>
+            @if (store.court(); as court) {
+              @if (store.selectedRange(); as range) {
+                <aside class="mt-6 rounded-2xl border border-line bg-white px-4 py-4 text-sm">
+                  <p class="font-medium">{{ court.name }}</p>
+                  <p class="mt-1 text-muted">
+                    {{ store.date() }} · {{ clock(range[0].start, court.timezone) }} –
+                    {{ clock(range[range.length - 1].end, court.timezone) }}
+                  </p>
+                  <p class="mt-2 font-medium text-pitch">{{ money(store.estimatedTotal()) }}</p>
+                </aside>
+              }
+            }
+
+            @if (store.error() && store.selectedRange()) {
+              <p class="mt-4 text-sm text-red-700" role="alert">{{ store.error() }}</p>
+            }
+
+            <button
+              type="button"
+              class="mt-6 w-full rounded-2xl bg-pitch px-4 py-3 font-semibold text-sand hover:bg-turf disabled:cursor-not-allowed disabled:opacity-50"
+              [disabled]="!store.canSubmit()"
+              (click)="store.submit()"
+            >
+              Pagar {{ money(store.estimatedTotal()) }}
+            </button>
+          }
+        </section>
+      </div>
+    </div>
   }
 </div>

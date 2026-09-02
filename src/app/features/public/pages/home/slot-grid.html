@@ -12,12 +12,12 @@
     <span class="inline-flex items-center gap-1.5"><span class="size-2.5 rounded-full bg-lime"></span> Elegido</span>
   </div>
 
-  <div class="grid grid-cols-2 gap-2 sm:grid-cols-3">
+  <div class="grid grid-cols-2 gap-2 lg:grid-cols-4">
     @for (slot of store.slots(); track slot.start; let i = $index) {
       @let tz = store.court()?.timezone ?? 'America/Bogota';
       <button
         type="button"
-        class="rounded-xl border px-3 py-2.5 text-sm"
+        class="whitespace-nowrap rounded-xl border px-4 py-3 text-sm"
         [disabled]="slot.status !== 'free'"
         [class.border-lime]="isInRange(i)"
         [class.bg-lime]="isInRange(i)"

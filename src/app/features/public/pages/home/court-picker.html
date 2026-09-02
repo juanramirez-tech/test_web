@@ -5,7 +5,7 @@
 } @else if (store.courtsState() === 'empty') {
   <p class="text-sm text-muted">No hay canchas activas por ahora.</p>
 } @else {
-  <ul class="grid gap-3 sm:grid-cols-2">
+  <ul class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
     @for (court of store.courts(); track court.id) {
       <li>
         <button

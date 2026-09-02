@@ -4,12 +4,13 @@ import { ReservationStore } from '../../reservation/reservation.store';
 import { formatClock, formatCop } from '../../reservation/datetime';
 import { BookingSuccess } from './booking-success';
 import { CourtPicker } from './court-picker';
+import { DateCalendar } from './date-calendar';
 import { GuestForm } from './guest-form';
 import { SlotGrid } from './slot-grid';
 
 @Component({
   selector: 'app-home',
-  imports: [CourtPicker, SlotGrid, GuestForm, BookingSuccess],
+  imports: [CourtPicker, DateCalendar, SlotGrid, GuestForm, BookingSuccess],
   providers: [ReservationStore],
   templateUrl: './home.html',
 })
@@ -23,7 +24,7 @@ export class Home {
     { n: 2 as const, label: 'Día' },
     { n: 3 as const, label: 'Horario' },
     { n: 4 as const, label: 'Datos' },
-        { n: 5 as const, label: 'Pago' },
+    { n: 5 as const, label: 'Pago' },
   ];
 
   constructor() {
@@ -36,9 +37,9 @@ export class Home {
         return;
       }
       const ids: Record<number, string> = {
-        2: 'paso-fecha',
-        3: 'paso-horario',
-        4: 'paso-datos',
+        2: 'paso-cuando',
+        3: 'paso-cuando',
+        4: 'paso-cuando',
         5: 'paso-listo',
       };
       const id = ids[step];
@@ -46,10 +47,5 @@ export class Home {
         document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' }),
       );
     });
-  }
-
-  protected onDateChange(event: Event): void {
-    const value = (event.target as HTMLInputElement).value;
-    this.store.selectDate(value);
   }
 }

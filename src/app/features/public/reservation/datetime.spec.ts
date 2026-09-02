@@ -3,9 +3,11 @@ import {
   durationMinutes,
   estimateTotal,
   formatClock,
+  formatMonthTitle,
   isColombianPhone,
   isDateInBookingWindow,
   isDateYmd,
+  monthCells,
   sliceSlotRange,
   toBookingItem,
   todayYmd,
@@ -63,5 +65,25 @@ describe('datetime', () => {
   it('validates Colombian mobile numbers', () => {
     expect(isColombianPhone('3001234567')).toBeTrue();
     expect(isColombianPhone('2001234567')).toBeFalse();
+  });
+
+  it('builds a Monday-first month grid inside the booking window', () => {
+    const cells = monthCells(2026, 9, '2026-09-01', '2026-10-01');
+    expect(cells.length).toBe(42);
+    expect(cells[0]).toEqual({
+      ymd: '2026-08-31',
+      day: 31,
+      inMonth: false,
+      selectable: false,
+    });
+    expect(cells[1]).toEqual({
+      ymd: '2026-09-01',
+      day: 1,
+      inMonth: true,
+      selectable: true,
+    });
+    expect(cells.find((cell) => cell.ymd === '2026-10-01')?.selectable).toBeTrue();
+    expect(cells.find((cell) => cell.ymd === '2026-10-02')?.selectable).toBeFalse();
+    expect(formatMonthTitle(2026, 9)).toContain('2026');
   });
 });

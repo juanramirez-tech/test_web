@@ -1,5 +1,8 @@
 @if (store.paying()) {
-  <section class="rounded-2xl border border-line bg-white px-5 py-12 text-center" id="paso-listo">
+  <section
+    class="w-full rounded-2xl border border-line bg-white px-6 py-16 text-center sm:px-10 sm:py-20"
+    id="paso-listo"
+  >
     <div class="relative mx-auto mb-6 size-16">
       <span class="pay-ring absolute inset-0 rounded-full border-2 border-lime"></span>
       <span class="pay-ring pay-ring-delay absolute inset-0 rounded-full border-2 border-turf"></span>
@@ -9,40 +12,48 @@
       ></span>
     </div>
     <p class="text-sm font-medium text-turf">Simulación de pago</p>
-    <h2 class="mt-1 text-2xl font-semibold">Procesando el pago…</h2>
-    <p class="mt-2 text-sm text-muted">No se cobra una tarjeta real. Esto solo confirma la reserva.</p>
+    <h2 class="mt-1 text-2xl font-semibold sm:text-3xl">Procesando el pago…</h2>
+    <p class="mx-auto mt-2 max-w-xl text-sm text-muted">
+      No se cobra una tarjeta real. Esto solo confirma la reserva.
+    </p>
     @if (store.court(); as court) {
-      <p class="mt-6 text-sm font-medium text-pitch">{{ money(store.estimatedTotal()) }}</p>
+      <p class="mt-8 text-lg font-medium text-pitch">{{ money(store.estimatedTotal()) }}</p>
       <p class="mt-1 text-sm text-muted">{{ court.name }}</p>
     }
   </section>
 } @else if (store.booking(); as booking) {
-  <section class="rounded-2xl border border-line bg-white px-5 py-8" id="paso-listo">
-    <p class="text-sm font-medium text-turf">Reserva confirmada</p>
-    <h2 class="mt-1 text-2xl font-semibold">Pago simulado. Horario reservado.</h2>
-    <p class="mt-2 text-sm text-muted">
-      El cobro es de prueba. Tu cancha quedó pagada para el horario elegido.
-    </p>
+  <section class="w-full rounded-2xl border border-line bg-white px-6 py-8 sm:px-10 sm:py-10" id="paso-listo">
+    <div class="grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(16rem,22rem)]">
+      <div>
+        <p class="text-sm font-medium text-turf">Reserva confirmada</p>
+        <h2 class="mt-1 text-2xl font-semibold sm:text-3xl">Pago simulado. Horario reservado.</h2>
+        <p class="mt-2 max-w-xl text-sm text-muted">
+          El cobro es de prueba. Tu cancha quedó pagada para el horario elegido.
+        </p>
+      </div>
 
-    @if (store.court(); as court) {
-      @if (store.selectedRange(); as range) {
-        <aside class="mt-6 rounded-xl border border-line bg-sand px-4 py-4 text-sm">
-          <p class="font-medium">{{ court.name }}</p>
-          <p class="mt-1 text-muted">
-            {{ store.date() }} · {{ clock(range[0].start, court.timezone) }} –
-            {{ clock(range[range.length - 1].end, court.timezone) }}
-          </p>
-          <p class="mt-2 font-medium text-pitch">{{ money(+booking.total_amount) }}</p>
-        </aside>
-      }
-    }
+      <div>
+        @if (store.court(); as court) {
+          @if (store.selectedRange(); as range) {
+            <aside class="rounded-xl border border-line bg-sand px-4 py-4 text-sm">
+              <p class="font-medium">{{ court.name }}</p>
+              <p class="mt-1 text-muted">
+                {{ store.date() }} · {{ clock(range[0].start, court.timezone) }} –
+                {{ clock(range[range.length - 1].end, court.timezone) }}
+              </p>
+              <p class="mt-2 font-medium text-pitch">{{ money(+booking.total_amount) }}</p>
+            </aside>
+          }
+        }
 
-    <button
-      type="button"
-      class="mt-8 w-full rounded-2xl bg-pitch px-4 py-3 font-semibold text-sand hover:bg-turf"
-      (click)="store.startOver()"
-    >
-      Nueva reserva
-    </button>
+        <button
+          type="button"
+          class="mt-6 w-full rounded-2xl bg-pitch px-4 py-3 font-semibold text-sand hover:bg-turf"
+          (click)="store.startOver()"
+        >
+          Nueva reserva
+        </button>
+      </div>
+    </div>
   </section>
 }
