@@ -1,0 +1,176 @@
+<div class="flex flex-wrap items-end justify-between gap-4">
+  <div>
+    <p class="text-sm font-medium text-turf">Reservas</p>
+    <h1 class="mt-1 text-3xl font-semibold tracking-tight">Listado</h1>
+    <p class="mt-2 max-w-2xl text-sm text-muted">
+      Misma tabla del panel: busca, filtra por columna y abre el detalle en un modal.
+    </p>
+  </div>
+  <label class="block text-sm">
+    <span class="sr-only">Buscar reservas</span>
+    <span class="relative block">
+      <app-admin-icon name="search" class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
+      <input
+        type="search"
+        class="w-72 rounded-xl border border-line bg-white py-2 pl-9 pr-3 text-sm outline-none focus:border-pitch"
+        placeholder="Buscar invitado, correo o cancha"
+        [(ngModel)]="quickFilter"
+      />
+    </span>
+  </label>
+</div>
+
+<div class="mt-6 flex flex-wrap gap-2">
+  <button
+    type="button"
+    class="rounded-full border px-3 py-1.5 text-xs font-medium"
+    [class.border-pitch]="status === ''"
+    [class.bg-pitch]="status === ''"
+    [class.text-sand]="status === ''"
+    [class.border-line]="status !== ''"
+    [class.bg-white]="status !== ''"
+    [class.text-muted]="status !== ''"
+    (click)="selectStatus('')"
+  >
+    Todas
+    @if (allTotal()) {
+      <span class="ml-1 opacity-70">{{ allTotal() }}</span>
+    }
+  </button>
+  @for (item of statuses; track item) {
+    <button
+      type="button"
+      class="rounded-full border px-3 py-1.5 text-xs font-medium"
+      [class.border-pitch]="status === item"
+      [class.bg-pitch]="status === item"
+      [class.text-sand]="status === item"
+      [class.border-line]="status !== item"
+      [class.bg-white]="status !== item"
+      [class.text-muted]="status !== item"
+      (click)="selectStatus(item)"
+    >
+      {{ statusLabel[item] }}
+      <span class="ml-1 opacity-70">{{ counts()[item] }}</span>
+    </button>
+  }
+</div>
+
+<form class="mt-4 flex flex-wrap items-end gap-3" (ngSubmit)="applyFilters()">
+  <label class="text-sm">
+    <span class="mb-1 block text-xs font-medium text-muted">Día de juego (Bogotá)</span>
+    <input
+      type="date"
+      name="date"
+      class="rounded-xl border border-line bg-white px-3 py-2 text-sm outline-none focus:border-pitch"
+      [(ngModel)]="date"
+    />
+  </label>
+  <button type="submit" class="rounded-2xl bg-pitch px-4 py-2 text-sm font-semibold text-sand hover:bg-turf">
+    Filtrar día
+  </button>
+  @if (date) {
+    <button
+      type="button"
+      class="text-sm text-muted underline"
+      (click)="date = ''; applyFilters()"
+    >
+      Quitar fecha
+    </button>
+  }
+</form>
+
+@if (error()) {
+  <p class="mt-6 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800" role="alert">
+    {{ error() }}
+  </p>
+}
+
+@if (loading()) {
+  <p class="mt-8 text-sm text-muted">Cargando reservas…</p>
+} @else if (rows().length === 0) {
+  <p class="mt-8 text-sm text-muted">No hay reservas con esos filtros.</p>
+} @else {
+  @if (total() > rows().length) {
+    <p class="mt-4 text-xs text-muted">
+      Hay {{ total() }} reservas; se muestran las {{ rows().length }} más recientes. Afina por estado o día
+      para ver el resto.
+    </p>
+  }
+  <div class="admin-grid admin-grid-lg mt-4 overflow-hidden rounded-2xl border border-line bg-white">
+    <ag-grid-angular
+      class="h-full w-full"
+      [theme]="theme"
+      [rowData]="rows()"
+      [columnDefs]="columnDefs"
+      [defaultColDef]="defaultColDef"
+      [gridOptions]="gridOptions"
+      [localeText]="localeText"
+      [quickFilterText]="quickFilter"
+    />
+  </div>
+}
+
+@if (selected(); as current) {
+  <app-booking-detail-dialog
+    [booking]="current"
+    (saved)="onBookingSaved($event)"
+    (closed)="closeDetail()"
+  />
+}
+
+@if (pending(); as action) {
+  <div class="fixed inset-0 z-[60] flex items-center justify-center p-4">
+    <button type="button" class="absolute inset-0 bg-pitch/55" aria-label="Cerrar" (click)="cancelPending()"></button>
+    <section
+      class="relative z-10 w-full max-w-md rounded-3xl border border-line bg-sand p-5 shadow-2xl"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="booking-confirm-title"
+    >
+      <div class="flex items-start gap-3">
+        <span
+          class="mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-2xl"
+          [class.bg-red-100]="action.type === 'cancel'"
+          [class.text-red-800]="action.type === 'cancel'"
+          [class.bg-lime/60]="action.type === 'confirm'"
+          [class.text-pitch]="action.type === 'confirm'"
+        >
+          <app-admin-icon [name]="action.type === 'cancel' ? 'alert' : 'check'" class="text-xl" />
+        </span>
+        <div>
+          <h2 id="booking-confirm-title" class="text-lg font-semibold">
+            {{ action.type === 'confirm' ? 'Confirmar reserva' : 'Cancelar reserva' }}
+          </h2>
+          <p class="mt-2 text-sm text-muted">
+            @if (action.type === 'confirm') {
+              ¿Confirmar la reserva de {{ action.row.guest }}?
+            } @else {
+              ¿Cancelar la reserva de {{ action.row.guest }}?
+              @if (action.row.status === 'paid' || action.row.status === 'confirmed') {
+                Se retiene el 30% si ya pagó o está confirmada.
+              }
+            }
+          </p>
+        </div>
+      </div>
+      <div class="mt-5 flex flex-wrap justify-end gap-2">
+        <button
+          type="button"
+          class="rounded-2xl px-4 py-2.5 text-sm font-medium text-muted hover:bg-white"
+          (click)="cancelPending()"
+        >
+          Volver
+        </button>
+        <button
+          type="button"
+          class="rounded-2xl px-4 py-2.5 text-sm font-semibold text-sand hover:opacity-90"
+          [class.bg-pitch]="action.type === 'confirm'"
+          [class.bg-red-800]="action.type === 'cancel'"
+          (click)="confirmPending()"
+        >
+          {{ action.type === 'confirm' ? 'Confirmar' : 'Cancelar reserva' }}
+        </button>
+      </div>
+    </section>
+  </div>
+}

@@ -11,8 +11,6 @@ import { PageMeta } from '../../core/seo/page-meta';
 export class AdminShell {
   private readonly auth = inject(AuthService);
 
-  protected readonly email = this.auth.email;
-
   constructor() {
     inject(PageMeta).privatePage('Admin · Reservas de canchas');
   }

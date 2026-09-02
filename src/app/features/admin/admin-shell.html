@@ -1,19 +1,27 @@
 <div class="min-h-screen bg-sand font-sans text-ink">
   <header class="border-b border-line bg-pitch text-sand">
-    <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-4">
+    <div class="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-5 py-4">
       <div>
         <a routerLink="/admin" class="text-base font-semibold tracking-tight">Reserva de canchas</a>
         <p class="text-xs text-sand/60">Administración</p>
       </div>
-      <nav class="flex items-center gap-4 text-sm">
-        <a routerLink="/admin/dashboard" routerLinkActive="text-lime" class="text-sand/80 hover:text-lime">
+      <nav class="flex flex-wrap items-center gap-4 text-sm">
+        <a
+          routerLink="/admin/dashboard"
+          routerLinkActive="text-lime"
+          [routerLinkActiveOptions]="{ exact: true }"
+          class="text-sand/80 hover:text-lime"
+        >
           Panel
         </a>
+        <a routerLink="/admin/courts" routerLinkActive="text-lime" class="text-sand/80 hover:text-lime">Canchas</a>
+        <a routerLink="/admin/bookings" routerLinkActive="text-lime" class="text-sand/80 hover:text-lime">Reservas</a>
         <a routerLink="/" class="text-sand/60 hover:text-sand">Sitio público</a>
-        @if (email(); as user) {
-          <span class="hidden text-sand/50 sm:inline">{{ user }}</span>
-        }
-        <button type="button" class="rounded-full bg-lime px-3 py-1.5 text-xs font-semibold text-pitch hover:bg-sand" (click)="logout()">
+        <button
+          type="button"
+          class="rounded-full bg-lime px-3 py-1.5 text-xs font-semibold text-pitch hover:bg-sand"
+          (click)="logout()"
+        >
           Salir
         </button>
       </nav>

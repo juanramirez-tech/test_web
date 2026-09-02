@@ -1,8 +1,92 @@
-<section class="max-w-2xl">
+<section>
   <p class="text-sm font-medium text-turf">Panel</p>
-  <h1 class="mt-1 text-3xl font-semibold tracking-tight">Hola, administrador</h1>
-  <p class="mt-3 text-muted">
-    Sesión iniciada. Desde aquí vas a gestionar canchas y reservas. El sitio público sigue en
-    <a routerLink="/" class="text-pitch underline">la página de reservas</a>.
-  </p>
+  <h1 class="mt-1 text-3xl font-semibold tracking-tight">Resumen</h1>
+  <p class="mt-2 text-muted">Canchas y reservas según el estado actual en la API.</p>
 </section>
+
+@if (state() === 'loading') {
+  <p class="mt-8 text-sm text-muted">Cargando panel…</p>
+} @else if (state() === 'down') {
+  <p class="mt-8 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800" role="alert">
+    {{ error() }}
+  </p>
+  <button type="button" class="mt-4 text-sm text-pitch underline" (click)="load()">Reintentar</button>
+} @else {
+  <div class="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+    <article class="rounded-2xl border border-line bg-white px-4 py-4">
+      <p class="text-xs font-medium text-muted">Canchas</p>
+      <p class="mt-1 text-2xl font-semibold text-pitch">{{ courtTotal() }}</p>
+      <p class="mt-1 text-sm text-muted">{{ courtsActive() }} activas · {{ courtsInactive() }} inactivas</p>
+    </article>
+    <article class="rounded-2xl border border-line bg-white px-4 py-4">
+      <p class="text-xs font-medium text-muted">Pagadas</p>
+      <p class="mt-1 text-2xl font-semibold text-pitch">{{ bookingCounts().paid }}</p>
+      <p class="mt-1 text-sm text-muted">Listas para confirmar</p>
+    </article>
+    <article class="rounded-2xl border border-line bg-white px-4 py-4">
+      <p class="text-xs font-medium text-muted">Confirmadas</p>
+      <p class="mt-1 text-2xl font-semibold text-pitch">{{ bookingCounts().confirmed }}</p>
+      <p class="mt-1 text-sm text-muted">{{ bookingCounts().pending_payment }} en hold</p>
+    </article>
+    <article class="rounded-2xl border border-line bg-white px-4 py-4">
+      <p class="text-xs font-medium text-muted">Cerradas</p>
+      <p class="mt-1 text-2xl font-semibold text-pitch">
+        {{ bookingCounts().cancelled + bookingCounts().expired }}
+      </p>
+      <p class="mt-1 text-sm text-muted">
+        {{ bookingCounts().cancelled }} canceladas · {{ bookingCounts().expired }} expiradas
+      </p>
+    </article>
+  </div>
+
+  <div class="mt-10 flex flex-wrap gap-3">
+    <a
+      routerLink="/admin/courts"
+      class="rounded-2xl bg-pitch px-4 py-2.5 text-sm font-semibold text-sand hover:bg-turf"
+    >
+      Gestionar canchas
+    </a>
+    <a
+      routerLink="/admin/bookings"
+      class="rounded-2xl border border-pitch px-4 py-2.5 text-sm font-semibold text-pitch hover:bg-white"
+    >
+      Ver reservas
+    </a>
+  </div>
+
+  <section class="mt-12">
+    <div class="flex flex-wrap items-end justify-between gap-4">
+      <div>
+        <h2 class="text-lg font-semibold">Reservas recientes</h2>
+        <p class="mt-1 text-sm text-muted">Filtra por columna o busca. Clic en la fila abre el detalle en un modal.</p>
+      </div>
+      @if (rows().length) {
+        <label class="block text-sm">
+          <span class="sr-only">Buscar reservas</span>
+          <input
+            type="search"
+            class="w-64 rounded-xl border border-line bg-white px-3 py-2 text-sm outline-none focus:border-pitch"
+            placeholder="Buscar invitado, correo o estado"
+            [(ngModel)]="quickFilter"
+          />
+        </label>
+      }
+    </div>
+    @if (rows().length === 0) {
+      <p class="mt-3 text-sm text-muted">Todavía no hay reservas.</p>
+    } @else {
+      <div class="admin-grid mt-4 overflow-hidden rounded-2xl border border-line bg-white">
+        <ag-grid-angular
+          class="h-full w-full"
+          [theme]="theme"
+          [rowData]="rows()"
+          [columnDefs]="columnDefs"
+          [defaultColDef]="defaultColDef"
+          [gridOptions]="gridOptions"
+          [localeText]="localeText"
+          [quickFilterText]="quickFilter"
+        />
+      </div>
+    }
+  </section>
+}

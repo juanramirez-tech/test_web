@@ -27,4 +27,8 @@ export class AdminCourtsApi {
   update(id: number, body: Partial<CourtWrite>): Observable<Court> {
     return this.api.patch<Court>(API.v1.admin.court(id), body);
   }
+
+  remove(id: number): Observable<{ ok: true }> {
+    return this.api.delete<{ ok: true }>(API.v1.admin.court(id));
+  }
 }

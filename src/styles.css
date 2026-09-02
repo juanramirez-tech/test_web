@@ -41,3 +41,19 @@
   white-space: nowrap;
   border-width: 0;
 }
+
+.admin-grid {
+  height: 28rem;
+}
+
+.admin-grid-lg {
+  height: min(40rem, calc(100vh - 18rem));
+}
+
+.admin-grid .ag-root-wrapper {
+  border: 0;
+}
+
+.admin-grid .ag-row {
+  cursor: pointer;
+}
