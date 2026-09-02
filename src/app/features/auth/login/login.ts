@@ -22,6 +22,7 @@ export class Login {
   private readonly destroyRef = inject(DestroyRef);
 
   protected readonly submitting = signal(false);
+  protected readonly showPassword = signal(false);
   protected readonly formError = signal<string | null>(null);
   protected readonly hint = this.hintFromReason(this.route.snapshot.queryParamMap.get('reason'));
 
