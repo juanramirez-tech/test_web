@@ -1,4 +1,5 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, DestroyRef, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AgGridAngular } from 'ag-grid-angular';
@@ -32,6 +33,7 @@ export class Dashboard {
   private readonly courtsApi = inject(AdminCourtsApi);
   private readonly bookingsApi = inject(AdminBookingsApi);
   private readonly router = inject(Router);
+  private readonly destroyRef = inject(DestroyRef);
 
   readonly money = formatCop;
   readonly when = formatAdminDateTime;
@@ -136,7 +138,7 @@ export class Dashboard {
       confirmed: this.bookingsApi.list({ status: 'confirmed', limit: 1 }),
       cancelled: this.bookingsApi.list({ status: 'cancelled', limit: 1 }),
       expired: this.bookingsApi.list({ status: 'expired', limit: 1 }),
-    }).subscribe({
+    }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (result) => {
         this.courtTotal.set(result.courts.length);
         this.courtsActive.set(result.courts.filter((court) => court.status === 'active').length);

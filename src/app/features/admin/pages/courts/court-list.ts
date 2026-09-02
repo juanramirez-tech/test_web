@@ -1,6 +1,8 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, DestroyRef, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AdminCourtsApi } from '../../../../core/api/admin-courts.api';
 import { Court } from '../../../../core/api/api.models';
+import { DialogFocus } from '../../../../core/a11y/dialog-focus';
 import { PageMeta } from '../../../../core/seo/page-meta';
 import { formatCop } from '../../../public/reservation/datetime';
 import { apiMessage, courtStatusLabel, nextCourtStatus } from '../../admin-view';
@@ -16,7 +18,7 @@ type ConfirmAction = {
 
 @Component({
   selector: 'app-court-list',
-  imports: [AdminIcon, CourtFormDialog],
+  imports: [AdminIcon, CourtFormDialog, DialogFocus],
   templateUrl: './court-list.html',
   host: {
     '(document:keydown.escape)': 'onEscape()',
@@ -24,6 +26,7 @@ type ConfirmAction = {
 })
 export class CourtList {
   private readonly api = inject(AdminCourtsApi);
+  private readonly destroyRef = inject(DestroyRef);
 
   readonly money = formatCop;
   readonly statusLabel = courtStatusLabel;
@@ -44,7 +47,7 @@ export class CourtList {
   load(): void {
     this.state.set('loading');
     this.error.set(null);
-    this.api.list().subscribe({
+    this.api.list().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (courts) => {
         this.courts.set(courts);
         this.state.set(courts.length ? 'ready' : 'empty');
@@ -115,7 +118,7 @@ export class CourtList {
     const next = nextCourtStatus(court.status);
     this.busyId.set(court.id);
     this.error.set(null);
-    this.api.update(court.id, { status: next }).subscribe({
+    this.api.update(court.id, { status: next }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (updated) => {
         this.courts.set(this.courts().map((item) => (item.id === updated.id ? updated : item)));
         this.busyId.set(null);
@@ -130,7 +133,7 @@ export class CourtList {
   private remove(court: Court): void {
     this.busyId.set(court.id);
     this.error.set(null);
-    this.api.remove(court.id).subscribe({
+    this.api.remove(court.id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         const next = this.courts().filter((item) => item.id !== court.id);
         this.courts.set(next);

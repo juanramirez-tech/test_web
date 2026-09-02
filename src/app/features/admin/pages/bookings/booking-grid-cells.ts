@@ -83,14 +83,14 @@ export class BookingStatusCell implements ICellRendererAngularComp {
   imports: [AdminIcon],
   template: `
     @if (row) {
-      <div class="flex items-center justify-end gap-1" (click)="$event.stopPropagation()">
+      <div class="flex items-center justify-end gap-1">
         @if (row.canConfirm) {
           <button
             type="button"
             class="rounded-lg p-1.5 text-pitch hover:bg-lime/50"
             title="Confirmar"
             aria-label="Confirmar"
-            (click)="confirm()"
+            (click)="confirm(); $event.stopPropagation()"
           >
             <app-admin-icon name="check" class="text-base" />
           </button>
@@ -101,7 +101,7 @@ export class BookingStatusCell implements ICellRendererAngularComp {
             class="rounded-lg p-1.5 text-red-800 hover:bg-red-50"
             title="Cancelar"
             aria-label="Cancelar"
-            (click)="cancel()"
+            (click)="cancel(); $event.stopPropagation()"
           >
             <app-admin-icon name="close" class="text-base" />
           </button>
@@ -111,7 +111,7 @@ export class BookingStatusCell implements ICellRendererAngularComp {
           class="rounded-lg p-1.5 text-muted hover:bg-sand hover:text-pitch"
           title="Ver detalle"
           aria-label="Ver detalle"
-          (click)="open()"
+          (click)="open(); $event.stopPropagation()"
         >
           <app-admin-icon name="eye" class="text-base" />
         </button>

@@ -26,7 +26,7 @@ export class Login {
   protected readonly formError = signal<string | null>(null);
   protected readonly hint = this.hintFromReason(this.route.snapshot.queryParamMap.get('reason'));
 
-  protected readonly form = this.fb.nonNullable.group({
+  readonly form = this.fb.nonNullable.group({
     email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required, Validators.minLength(8)]],
   });
@@ -35,7 +35,7 @@ export class Login {
     inject(PageMeta).privatePage('Admin · Iniciar sesión');
   }
 
-  protected submit(): void {
+  submit(): void {
     this.formError.set(null);
     this.form.markAllAsTouched();
 

@@ -11,11 +11,12 @@ import {
   formatAdminDate,
   formatAdminDateTime,
 } from '../../admin-view';
+import { DialogFocus } from '../../../../core/a11y/dialog-focus';
 import { AdminIcon } from '../../ui/admin-icon';
 
 @Component({
   selector: 'app-booking-detail-dialog',
-  imports: [AdminIcon],
+  imports: [AdminIcon, DialogFocus],
   templateUrl: './booking-detail.html',
 })
 export class BookingDetailDialog {

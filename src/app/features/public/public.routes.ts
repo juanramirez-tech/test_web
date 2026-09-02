@@ -15,11 +15,6 @@ export const publicRoutes: Routes = [
         redirectTo: '',
         pathMatch: 'full',
       },
-      {
-        path: 'mi-reserva',
-        loadComponent: () =>
-          import('./pages/my-booking/my-booking').then((m) => m.MyBookingPage),
-      },
     ],
   },
 ];

@@ -17,6 +17,7 @@ import {
   apiMessage,
   toBookingRow,
 } from '../../admin-view';
+import { DialogFocus } from '../../../../core/a11y/dialog-focus';
 import { AdminIcon } from '../../ui/admin-icon';
 import {
   BookingActionsCell,
@@ -35,7 +36,7 @@ type ConfirmAction = {
 
 @Component({
   selector: 'app-booking-list',
-  imports: [FormsModule, AgGridAngular, AdminIcon, BookingDetailDialog],
+  imports: [FormsModule, AgGridAngular, AdminIcon, BookingDetailDialog, DialogFocus],
   templateUrl: './booking-list.html',
   host: {
     '(document:keydown.escape)': 'onEscape()',
@@ -280,7 +281,7 @@ export class BookingList implements BookingGridContext {
       query.date = this.date;
     }
 
-    this.bookingsApi.list(query).subscribe({
+    this.bookingsApi.list(query).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (result) => {
         this.bookings.set(result.bookings);
         this.rows.set(result.bookings.map((booking) => toBookingRow(booking)));
@@ -308,7 +309,7 @@ export class BookingList implements BookingGridContext {
       confirmed: this.bookingsApi.list({ status: 'confirmed', limit: 1 }),
       cancelled: this.bookingsApi.list({ status: 'cancelled', limit: 1 }),
       expired: this.bookingsApi.list({ status: 'expired', limit: 1 }),
-    }).subscribe({
+    }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (result) => {
         this.counts.set({
           pending_payment: result.pending_payment.total,
@@ -324,7 +325,7 @@ export class BookingList implements BookingGridContext {
   private confirm(row: BookingRow): void {
     this.busyId.set(row.id);
     this.error.set(null);
-    this.bookingsApi.confirm(row.id).subscribe({
+    this.bookingsApi.confirm(row.id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (updated) => this.afterUpdate(updated, row.status, updated.status),
       error: (error: unknown) => {
         this.busyId.set(null);
@@ -336,7 +337,7 @@ export class BookingList implements BookingGridContext {
   private cancel(row: BookingRow): void {
     this.busyId.set(row.id);
     this.error.set(null);
-    this.bookingsApi.cancel(row.id).subscribe({
+    this.bookingsApi.cancel(row.id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (updated) => this.afterUpdate(updated, row.status, updated.status),
       error: (error: unknown) => {
         this.busyId.set(null);

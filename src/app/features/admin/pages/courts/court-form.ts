@@ -3,6 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AdminCourtsApi } from '../../../../core/api/admin-courts.api';
 import { Court, SlotMinutes } from '../../../../core/api/api.models';
+import { DialogFocus } from '../../../../core/a11y/dialog-focus';
 import { AdminIcon } from '../../ui/admin-icon';
 import {
   apiMessage,
@@ -14,7 +15,7 @@ import {
 
 @Component({
   selector: 'app-court-form-dialog',
-  imports: [ReactiveFormsModule, AdminIcon],
+  imports: [ReactiveFormsModule, AdminIcon, DialogFocus],
   templateUrl: './court-form.html',
   host: {
     '(document:keydown.escape)': 'close()',

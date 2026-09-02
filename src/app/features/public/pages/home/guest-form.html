@@ -6,9 +6,14 @@
       type="text"
       autocomplete="name"
       class="w-full rounded-xl border border-line bg-white px-3 py-2.5 outline-none focus:border-pitch"
+      [class.border-red-300]="nameError()"
       [value]="store.guestName()"
       (input)="setName($event)"
+      (blur)="nameTouched.set(true)"
     />
+    @if (nameError()) {
+      <p class="mt-1 text-sm text-red-700">{{ nameError() }}</p>
+    }
   </div>
   <div>
     <label class="mb-1 block text-sm font-medium" for="guest-email">Correo</label>
@@ -17,9 +22,14 @@
       type="email"
       autocomplete="email"
       class="w-full rounded-xl border border-line bg-white px-3 py-2.5 outline-none focus:border-pitch"
+      [class.border-red-300]="emailError()"
       [value]="store.guestEmail()"
       (input)="setEmail($event)"
+      (blur)="emailTouched.set(true)"
     />
+    @if (emailError()) {
+      <p class="mt-1 text-sm text-red-700">{{ emailError() }}</p>
+    }
   </div>
   <div>
     <label class="mb-1 block text-sm font-medium" for="guest-phone">Celular</label>
@@ -30,8 +40,13 @@
       autocomplete="tel"
       maxlength="10"
       class="w-full rounded-xl border border-line bg-white px-3 py-2.5 outline-none focus:border-pitch"
+      [class.border-red-300]="phoneError()"
       [value]="store.guestPhone()"
       (input)="setPhone($event)"
+      (blur)="phoneTouched.set(true)"
     />
+    @if (phoneError()) {
+      <p class="mt-1 text-sm text-red-700">{{ phoneError() }}</p>
+    }
   </div>
 </div>
